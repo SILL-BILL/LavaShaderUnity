@@ -46,11 +46,10 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
-				// sample the texture
-				fixed4 col = tex2D(_MainTex, i.uv);
-				// apply fog
-				UNITY_APPLY_FOG(i.fogCoord, col);
-				return col;
+				half2 p = i.uv.xy; half2 a = p*4.; a.y -= _Time.w*0.5;
+				half2 f = frac(a); a -= f; f = f*f*(3.-2.*f);
+				half4 r = frac(sin((a.x + a.y*1e3) + half4(0, 1, 1e3, 1001)) * 1e5)*30./p.y;
+				return half4(p.y+half3(1,.5,.2) * clamp(lerp(lerp(r.x, r.y, f.x), lerp(r.z, r.w, f.x), f.y)-30., -.2, 1.),1);
 			}
 			ENDCG
 		}
